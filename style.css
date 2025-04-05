@@ -39,7 +39,7 @@ h1 {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 80, 158, 0.2);
-    width: 250px;
+    display: inline-block;
 }
 
 .weather strong {
@@ -70,4 +70,12 @@ th {
 
 td {
     background-color: #e0f2ff;
+}
+
+#controls {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
 }

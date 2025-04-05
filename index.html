@@ -8,7 +8,13 @@
 </head>
 <body>
     <h1>Custom Weather Report</h1>
-    <button id="toggle-unit">Switch to °C</button>
+    <div id="controls">
+        <button id="toggle-unit">Switch to °C</button>
+        <div id="checkboxes">
+            <input type="checkbox" id="toggle-forecast">
+            <label for="toggle-forecast">Extended Forecast</label>
+        </div>
+    </div>
     <div id="weather-container">
         <div class="weather" id="Omaha">Loading Omaha, NE weather...</div>
         <div class="weather" id="Mason City">Loading Mason City, IA weather...</div>

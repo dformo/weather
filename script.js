@@ -17,10 +17,12 @@ const weatherIcons = {
 };
 
 let useFahrenheit = true;
+let showExtendedForecast = false;
 
 async function fetchWeather(locationName, lat, lon) {
     const unit = useFahrenheit ? 'fahrenheit' : 'celsius';
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&temperature_unit=${unit}&timezone=auto`;
+    const daysToShow = showExtendedForecast ? 7 : 3;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&temperature_unit=${unit}&timezone=auto&forecast_days=${daysToShow}`;
 
     try {
         const response = await fetch(url);
@@ -32,14 +34,17 @@ async function fetchWeather(locationName, lat, lon) {
         const weatherIcon = weatherIcons[weatherCode] || "❓";
 
         // Convert forecast dates to day names and format as a table
-        let forecastTable = `<table><tr><th>Day</th><th>High</th><th>Low</th></tr>`;
+        let forecastTable = `<table><tr><th>Day</th><th>High</th><th>Low</th></tr>`; 
+        
         data.daily.time.forEach((date, index) => {
-            const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
+            const dayName = new Date(date + "T00:00:00").toLocaleDateString('en-US', { weekday: 'short' });
+            const forecastIcon = weatherIcons[data.daily.weathercode[index]] || "❓";
+
             forecastTable += `<tr>
-                <td>${dayName}</td>
+                <td>${forecastIcon} ${dayName}</td>
                 <td>${data.daily.temperature_2m_max[index]}°${useFahrenheit ? 'F' : 'C'}</td>
-                <td>${data.daily.temperature_2m_min[index]}°${useFahrenheit ? 'F' : 'C'}</td>
-            </tr>`;
+                <td>${data.daily.temperature_2m_min[index]}°${useFahrenheit ? 'F' : 'C'}</td>`;
+            forecastTable += `</tr>`;
         });
         forecastTable += `</table>`;
 
@@ -64,6 +69,14 @@ document.getElementById("toggle-unit").addEventListener("click", () => {
     document.getElementById("toggle-unit").innerText = useFahrenheit ? "Switch to °C" : "Switch to °F";
 
     // Re-fetch weather data with the new unit
+    Object.keys(locations).forEach(location => {
+        fetchWeather(location, locations[location].lat, locations[location].lon);
+    });
+});
+
+// Toggle extended forecast checkbox
+document.getElementById("toggle-forecast").addEventListener("change", () => {
+    showExtendedForecast = document.getElementById("toggle-forecast").checked;
     Object.keys(locations).forEach(location => {
         fetchWeather(location, locations[location].lat, locations[location].lon);
     });
