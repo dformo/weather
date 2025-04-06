@@ -26,6 +26,21 @@ h1 {
     background-color: #003f7f;
 }
 
+#toggle-forecast {
+    background-color: #00509e;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 10px;
+}
+
+#toggle-forecast:hover {
+    background-color: #003f7f;
+}
+
 #weather-container {
     display: flex;
     justify-content: center;
@@ -72,10 +87,16 @@ td {
     background-color: #e0f2ff;
 }
 
-#controls {
-    display: flex;
-    flex-direction: column; /* Stack elements vertically */
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
+footer {
+    text-align: center;
+    font-size: 12px;
+    margin-top: 20px;
+    color: gray;
+}
+footer a {
+    text-decoration: none;
+    color: #00509e;
+}
+footer a:hover {
+    text-decoration: underline;
 }

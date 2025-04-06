@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Report</title>
+    <title>Custom Weather Report</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="assets/app-icon.png">
 </head>
 <body>
-    <h1>Custom Weather Report</h1>
     <div id="controls">
-        <button id="toggle-unit">Switch to °C</button>
-        <div id="checkboxes">
-            <input type="checkbox" id="toggle-forecast">
-            <label for="toggle-forecast">Extended Forecast</label>
-        </div>
+        <button id="toggle-forecast">7 Day Forecast</button>
+        <button id="toggle-unit">C°</button>
     </div>
     <div id="weather-container">
-        <div class="weather" id="Omaha">Loading Omaha, NE weather...</div>
         <div class="weather" id="Mason City">Loading Mason City, IA weather...</div>
-        <div class="weather" id="Mitaka">Loading Mitaka, Japan weather...</div>
         <div class="weather" id="Howell">Loading Howell, MI weather...</div>
+        <div class="weather" id="Omaha">Loading Omaha, NE weather...</div>
+        <div class="weather" id="Springfield">Loading Springfield, MO weather...</div>
+        <div class="weather" id="Groton">Loading Groton, CT weather...</div>
+        <div class="weather" id="Mitaka">Loading Mitaka, Japan weather...</div>
     </div>
     <script src="script.js"></script>
 </body>
+<footer>
+    <small>Weather data provided by <a href="https://open-meteo.com" target="_blank">Open-Meteo</a></small>
+</footer>
 </html>

@@ -1,8 +1,10 @@
 const locations = {
-    Omaha: { lat: 41.2565, lon: -95.9345 },
     "Mason City": { lat: 43.1542, lon: -93.201 },
-    Mitaka: { lat: 35.6838, lon: 139.5594 },
-    Howell: { lat: 42.6073, lon: -83.9294 }
+    Howell: { lat: 42.6073, lon: -83.9294 },
+    Omaha: { lat: 41.2565, lon: -95.9345 },
+    Springfield: { lat: 37.2153, lon: -93.2982 },
+    Groton: { lat: 41.3747, lon: -72.0691 },
+    Mitaka: { lat: 35.6838, lon: 139.5594 }
 };
 
 // Map Open-Meteo weather codes to icons
@@ -13,7 +15,9 @@ const weatherIcons = {
     51: "🌧️", 53: "🌧️", 55: "🌧️", 61: "🌧️", 63: "🌧️", 65: "🌧️", 67: "🌧️", // Rain/Drizzle
     71: "❄️", 73: "❄️", 75: "❄️", 77: "❄️", // Snow
     80: "🌦️", 81: "🌦️", 82: "🌦️", // Rain showers
-    95: "⛈️", 96: "⛈️", 99: "⛈️" // Thunderstorm
+    95: "⛈️", 96: "⛈️", 99: "⛈️", // Thunderstorm
+    sunrise: "🌅", // Sunrise
+    sunset: "🌇"  // Sunset
 };
 
 let useFahrenheit = true;
@@ -22,7 +26,7 @@ let showExtendedForecast = false;
 async function fetchWeather(locationName, lat, lon) {
     const unit = useFahrenheit ? 'fahrenheit' : 'celsius';
     const daysToShow = showExtendedForecast ? 7 : 3;
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&temperature_unit=${unit}&timezone=auto&forecast_days=${daysToShow}`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode,sunrise,sunset&temperature_unit=${unit}&timezone=auto&forecast_days=${daysToShow}`;
 
     try {
         const response = await fetch(url);
@@ -48,8 +52,15 @@ async function fetchWeather(locationName, lat, lon) {
         });
         forecastTable += `</table>`;
 
+        const sunriseTime = new Date(data.daily.sunrise[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+        const sunsetTime = new Date(data.daily.sunset[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+        const sunriseIcon = weatherIcons["sunrise"];
+        const sunsetIcon = weatherIcons["sunset"];
+
         document.getElementById(locationName).innerHTML = `
-            <strong>${locationName}: ${currentTemp}°${useFahrenheit ? 'F' : 'C'} ${weatherIcon}</strong>
+            <strong>${weatherIcon} ${currentTemp}°${useFahrenheit ? 'F' : 'C'} in ${locationName}</strong>
+            <hr>
+            <div><small>${sunriseIcon} ${sunriseTime}</small> <small>${sunsetIcon} ${sunsetTime}</small></div>
             <hr>
             ${forecastTable}
         `;
@@ -66,7 +77,7 @@ Object.keys(locations).forEach(location => {
 // Toggle temperature unit
 document.getElementById("toggle-unit").addEventListener("click", () => {
     useFahrenheit = !useFahrenheit;
-    document.getElementById("toggle-unit").innerText = useFahrenheit ? "Switch to °C" : "Switch to °F";
+    document.getElementById("toggle-unit").innerText = useFahrenheit ? "C°" : "F°";
 
     // Re-fetch weather data with the new unit
     Object.keys(locations).forEach(location => {
@@ -75,8 +86,9 @@ document.getElementById("toggle-unit").addEventListener("click", () => {
 });
 
 // Toggle extended forecast checkbox
-document.getElementById("toggle-forecast").addEventListener("change", () => {
-    showExtendedForecast = document.getElementById("toggle-forecast").checked;
+document.getElementById("toggle-forecast").addEventListener("click", () => {
+    showExtendedForecast = !showExtendedForecast;
+    document.getElementById("toggle-forecast").innerText = showExtendedForecast ? "3 Day Forecast" : "7 Day Forecast";
     Object.keys(locations).forEach(location => {
         fetchWeather(location, locations[location].lat, locations[location].lon);
     });
