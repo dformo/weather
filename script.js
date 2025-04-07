@@ -1,10 +1,12 @@
 const locations = {
-    "Mason City": { lat: 43.1542, lon: -93.201 },
-    Howell: { lat: 42.6073, lon: -83.9294 },
-    Omaha: { lat: 41.2565, lon: -95.9345 },
+    "Mason City": { lat: 43.150626, lon: -93.232637 },
+    Manly: { lat: 43.30777783333333, lon: -93.9808 },
+    Howell: { lat: 42.633055, lon: -83.933971 },
+    Omaha: { lat: 41.281406, lon: -96.213680 },
     Springfield: { lat: 37.2153, lon: -93.2982 },
     Groton: { lat: 41.3747, lon: -72.0691 },
-    Mitaka: { lat: 35.6838, lon: 139.5594 }
+    Mitaka: { lat: 35.6838, lon: 139.5594 },
+    Shizuoka: { lat: 35.0571817, lon: 138.0814498 }
 };
 
 // Map Open-Meteo weather codes to icons
