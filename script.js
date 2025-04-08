@@ -17,10 +17,25 @@ const weatherIcons = {
     51: "🌧️", 53: "🌧️", 55: "🌧️", 61: "🌧️", 63: "🌧️", 65: "🌧️", 67: "🌧️", // Rain/Drizzle
     71: "❄️", 73: "❄️", 75: "❄️", 77: "❄️", // Snow
     80: "🌦️", 81: "🌦️", 82: "🌦️", // Rain showers
-    95: "⛈️", 96: "⛈️", 99: "⛈️", // Thunderstorm
-    sunrise: "🌅", // Sunrise
-    sunset: "🌇"  // Sunset
+    95: "⛈️", 96: "⛈️", 99: "⛈️" // Thunderstorm
 };
+
+const windIcons = {
+    N: "⬆️", NE: "↗️", E: "➡️", SE: "↘️", S: "⬇️", SW: "↙️", W: "⬅️", NW: "↖️"
+};
+
+// Convert degrees to cardinal direction
+function getWindDirection(degrees) {
+    if (degrees >= 337.5 || degrees < 22.5) return "N";
+    if (degrees >= 22.5 && degrees < 67.5) return "NE";
+    if (degrees >= 67.5 && degrees < 112.5) return "E";
+    if (degrees >= 112.5 && degrees < 157.5) return "SE";
+    if (degrees >= 157.5 && degrees < 202.5) return "S";
+    if (degrees >= 202.5 && degrees < 247.5) return "SW";
+    if (degrees >= 247.5 && degrees < 292.5) return "W";
+    if (degrees >= 292.5 && degrees < 337.5) return "NW";
+    return "❓"; // Unknown direction
+}
 
 let useFahrenheit = true;
 let showExtendedForecast = false;
@@ -28,7 +43,7 @@ let showExtendedForecast = false;
 async function fetchWeather(locationName, lat, lon) {
     const unit = useFahrenheit ? 'fahrenheit' : 'celsius';
     const daysToShow = showExtendedForecast ? 7 : 3;
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode,sunrise,sunset&temperature_unit=${unit}&timezone=auto&forecast_days=${daysToShow}`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode,sunrise,sunset,precipitation_probability_mean&temperature_unit=${unit}&timezone=auto&forecast_days=${daysToShow}`;
 
     try {
         const response = await fetch(url);
@@ -40,7 +55,7 @@ async function fetchWeather(locationName, lat, lon) {
         const weatherIcon = weatherIcons[weatherCode] || "❓";
 
         // Convert forecast dates to day names and format as a table
-        let forecastTable = `<table><tr><th>Day</th><th>High</th><th>Low</th></tr>`; 
+        let forecastTable = `<table><tr><th>Day</th><th>High</th><th>Low</th><th>🌧️</th></tr>`;
         
         data.daily.time.forEach((date, index) => {
             const dayName = new Date(date + "T00:00:00").toLocaleDateString('en-US', { weekday: 'short' });
@@ -49,20 +64,25 @@ async function fetchWeather(locationName, lat, lon) {
             forecastTable += `<tr>
                 <td>${forecastIcon} ${dayName}</td>
                 <td>${data.daily.temperature_2m_max[index]}°${useFahrenheit ? 'F' : 'C'}</td>
-                <td>${data.daily.temperature_2m_min[index]}°${useFahrenheit ? 'F' : 'C'}</td>`;
+                <td>${data.daily.temperature_2m_min[index]}°${useFahrenheit ? 'F' : 'C'}</td>
+                <td>${data.daily.precipitation_probability_mean[index]}%</td>`;
             forecastTable += `</tr>`;
         });
         forecastTable += `</table>`;
 
         const sunriseTime = new Date(data.daily.sunrise[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
         const sunsetTime = new Date(data.daily.sunset[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
-        const sunriseIcon = weatherIcons["sunrise"];
-        const sunsetIcon = weatherIcons["sunset"];
+
+        const windSpeed = data.current_weather.windspeed;
+        const windDirectionDegrees = data.current_weather.winddirection;
+        const windDirection = getWindDirection(windDirectionDegrees);
+        const windDirectionIcon = windIcons[windDirection] || "❓";
+        const windUnits = data.current_weather_units["windspeed"];
 
         document.getElementById(locationName).innerHTML = `
             <strong>${weatherIcon} ${currentTemp}°${useFahrenheit ? 'F' : 'C'} in ${locationName}</strong>
             <hr>
-            <div><small>${sunriseIcon} ${sunriseTime}</small> <small>${sunsetIcon} ${sunsetTime}</small></div>
+            <div><small>🌅 ${sunriseTime} 🌇 ${sunsetTime} ${windDirectionIcon} ${windSpeed} ${windUnits}</small></div>
             <hr>
             ${forecastTable}
         `;
