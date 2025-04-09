@@ -6,7 +6,8 @@ const locations = {
     Springfield: { lat: 37.2153, lon: -93.2982 },
     Groton: { lat: 41.3747, lon: -72.0691 },
     Mitaka: { lat: 35.6838, lon: 139.5594 },
-    Shizuoka: { lat: 35.0571817, lon: 138.0814498 }
+    Shizuoka: { lat: 35.0571817, lon: 138.0814498 },
+    Kobe: { lat: 34.6913, lon: 135.183 }
 };
 
 // Map Open-Meteo weather codes to icons
@@ -34,29 +35,37 @@ function getWindDirection(degrees) {
     if (degrees >= 202.5 && degrees < 247.5) return "SW";
     if (degrees >= 247.5 && degrees < 292.5) return "W";
     if (degrees >= 292.5 && degrees < 337.5) return "NW";
-    return "❓"; // Unknown direction
+    return undefined;
 }
 
 let useFahrenheit = true;
 let showExtendedForecast = false;
 
+// API call to get weather data
 async function fetchWeather(locationName, lat, lon) {
     const unit = useFahrenheit ? 'fahrenheit' : 'celsius';
     const daysToShow = showExtendedForecast ? 7 : 3;
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode,sunrise,sunset,precipitation_probability_mean&temperature_unit=${unit}&timezone=auto&forecast_days=${daysToShow}`;
+
+    const baseUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+    const fieldsToReturn = `&daily=temperature_2m_max,temperature_2m_min,weathercode,sunrise,sunset,precipitation_probability_mean`;
+    const apiOptions = `&temperature_unit=${unit}&timezone=auto&forecast_days=${daysToShow}`;
+    const url = baseUrl + fieldsToReturn + apiOptions;
 
     try {
         const response = await fetch(url);
         const data = await response.json();
+        // console.log(data); /* Debug code */
 
-        // Ensure feels-like temperature is properly retrieved
+        const weatherIcon = weatherIcons[data.current_weather.weathercode] || "❓";
         const currentTemp = data.current_weather.temperature;
-        const weatherCode = data.current_weather.weathercode;
-        const weatherIcon = weatherIcons[weatherCode] || "❓";
+        const sunriseTime = new Date(data.daily.sunrise[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+        const sunsetTime = new Date(data.daily.sunset[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+        const windDirection = getWindDirection(data.current_weather.winddirection);
+        const windDirectionIcon = windIcons[windDirection] || "❓";
+        const windSpeed = data.current_weather.windspeed;
+        const windUnits = data.current_weather_units["windspeed"];
 
-        // Convert forecast dates to day names and format as a table
         let forecastTable = `<table><tr><th>Day</th><th>High</th><th>Low</th><th>🌧️</th></tr>`;
-        
         data.daily.time.forEach((date, index) => {
             const dayName = new Date(date + "T00:00:00").toLocaleDateString('en-US', { weekday: 'short' });
             const forecastIcon = weatherIcons[data.daily.weathercode[index]] || "❓";
@@ -70,15 +79,6 @@ async function fetchWeather(locationName, lat, lon) {
         });
         forecastTable += `</table>`;
 
-        const sunriseTime = new Date(data.daily.sunrise[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
-        const sunsetTime = new Date(data.daily.sunset[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
-
-        const windSpeed = data.current_weather.windspeed;
-        const windDirectionDegrees = data.current_weather.winddirection;
-        const windDirection = getWindDirection(windDirectionDegrees);
-        const windDirectionIcon = windIcons[windDirection] || "❓";
-        const windUnits = data.current_weather_units["windspeed"];
-
         document.getElementById(locationName).innerHTML = `
             <strong>${weatherIcon} ${currentTemp}°${useFahrenheit ? 'F' : 'C'} in ${locationName}</strong>
             <hr>
@@ -91,27 +91,26 @@ async function fetchWeather(locationName, lat, lon) {
     }
 }
 
-// Fetch weather for all locations using proper names
-Object.keys(locations).forEach(location => {
-    fetchWeather(location, locations[location].lat, locations[location].lon);
-});
+// Loop through locations and call api to get weather data
+function refreshList() {
+    Object.keys(locations).forEach(async location => {
+        await fetchWeather(location, locations[location].lat, locations[location].lon);
+    });
+}
 
-// Toggle temperature unit
+// Toggle temperature unit button click
 document.getElementById("toggle-unit").addEventListener("click", () => {
     useFahrenheit = !useFahrenheit;
     document.getElementById("toggle-unit").innerText = useFahrenheit ? "C°" : "F°";
-
-    // Re-fetch weather data with the new unit
-    Object.keys(locations).forEach(location => {
-        fetchWeather(location, locations[location].lat, locations[location].lon);
-    });
+    refreshList();
 });
 
-// Toggle extended forecast checkbox
+// Toggle extended forecast button click
 document.getElementById("toggle-forecast").addEventListener("click", () => {
     showExtendedForecast = !showExtendedForecast;
     document.getElementById("toggle-forecast").innerText = showExtendedForecast ? "3 Day Forecast" : "7 Day Forecast";
-    Object.keys(locations).forEach(location => {
-        fetchWeather(location, locations[location].lat, locations[location].lon);
-    });
+    refreshList();
 });
+
+// Initial page load
+refreshList();

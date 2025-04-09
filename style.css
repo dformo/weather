@@ -93,10 +93,12 @@ footer {
     margin-top: 20px;
     color: gray;
 }
+
 footer a {
     text-decoration: none;
     color: #00509e;
 }
+
 footer a:hover {
     text-decoration: underline;
 }
