@@ -99,6 +99,19 @@ function refreshList() {
     });
 }
 
+// Loop through locations and set html to show the data is loading
+function setListForLoading() {
+    const weatherContainer = document.getElementById("weather-container");
+    weatherContainer.innerHTML = "";
+    Object.keys(locations).forEach(location => {
+        const locationDiv = document.createElement("div");
+        locationDiv.className = "weather";
+        locationDiv.id = location;
+        locationDiv.innerText = `Loading ${location} weather...`;
+        weatherContainer.appendChild(locationDiv);
+    });
+}
+
 // Toggle temperature unit button click
 document.getElementById("toggle-unit").addEventListener("click", () => {
     const useMetric = localStorage.getItem("useMetric") === "true";
@@ -118,4 +131,5 @@ document.getElementById("toggle-forecast").addEventListener("click", () => {
 // Initial page load
 document.getElementById("toggle-unit").innerText = localStorage.getItem("useMetric") === "true" ? "F°" : "C°";
 document.getElementById("toggle-forecast").innerText = localStorage.getItem("showExtendedForecast") === "true" ? "3 Day Forecast" : "7 Day Forecast";
+setListForLoading();
 refreshList();
