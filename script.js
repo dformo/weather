@@ -7,7 +7,8 @@ const locations = {
     Groton: { lat: 41.3747, lon: -72.0691 },
     Mitaka: { lat: 35.6838, lon: 139.5594 },
     Shizuoka: { lat: 35.0571817, lon: 138.0814498 },
-    Kobe: { lat: 34.6913, lon: 135.183 }
+    Kobe: { lat: 34.6913, lon: 135.183 },
+    "Lino Lakes": { lat: 45.1395615, lon: -93.0291282 }
 };
 
 // Map Open-Meteo weather codes to icons
@@ -43,12 +44,13 @@ let showExtendedForecast = false;
 
 // API call to get weather data
 async function fetchWeather(locationName, lat, lon) {
-    const unit = useFahrenheit ? 'fahrenheit' : 'celsius';
+    const tempUnit = useFahrenheit ? 'fahrenheit' : 'celsius';
+    const windSpeedUnit = useFahrenheit ? "mph" : "kmh";
     const daysToShow = showExtendedForecast ? 7 : 3;
 
     const baseUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
     const fieldsToReturn = `&daily=temperature_2m_max,temperature_2m_min,weathercode,sunrise,sunset,precipitation_probability_mean`;
-    const apiOptions = `&temperature_unit=${unit}&timezone=auto&forecast_days=${daysToShow}`;
+    const apiOptions = `&temperature_unit=${tempUnit}&windspeed_unit=${windSpeedUnit}&timezone=auto&forecast_days=${daysToShow}`;
     const url = baseUrl + fieldsToReturn + apiOptions;
 
     try {
@@ -63,7 +65,7 @@ async function fetchWeather(locationName, lat, lon) {
         const windDirection = getWindDirection(data.current_weather.winddirection);
         const windDirectionIcon = windIcons[windDirection] || "❓";
         const windSpeed = data.current_weather.windspeed;
-        const windUnits = data.current_weather_units["windspeed"];
+        const windUnits = useFahrenheit ? windSpeedUnit : data.current_weather_units["windspeed"];
 
         let forecastTable = `<table><tr><th>Day</th><th>High</th><th>Low</th><th>🌧️</th></tr>`;
         data.daily.time.forEach((date, index) => {
@@ -113,4 +115,4 @@ document.getElementById("toggle-forecast").addEventListener("click", () => {
 });
 
 // Initial page load
-refreshList();
+    refreshList();
