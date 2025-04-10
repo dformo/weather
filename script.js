@@ -39,13 +39,12 @@ function getWindDirection(degrees) {
     return undefined;
 }
 
-let useFahrenheit = true;
-let showExtendedForecast = false;
-
 // API call to get weather data
 async function fetchWeather(locationName, lat, lon) {
-    const tempUnit = useFahrenheit ? 'fahrenheit' : 'celsius';
-    const windSpeedUnit = useFahrenheit ? "mph" : "kmh";
+    const useMetric = localStorage.getItem("useMetric") === "true";
+    const showExtendedForecast = localStorage.getItem("showExtendedForecast") === "true";
+    const tempUnit = useMetric ? 'celsius' : 'fahrenheit';
+    const windSpeedUnit = useMetric ? "kmh" : "mph";
     const daysToShow = showExtendedForecast ? 7 : 3;
 
     const baseUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
@@ -65,7 +64,7 @@ async function fetchWeather(locationName, lat, lon) {
         const windDirection = getWindDirection(data.current_weather.winddirection);
         const windDirectionIcon = windIcons[windDirection] || "❓";
         const windSpeed = data.current_weather.windspeed;
-        const windUnits = useFahrenheit ? windSpeedUnit : data.current_weather_units["windspeed"];
+        const windUnits = useMetric ? data.current_weather_units["windspeed"] : windSpeedUnit;
 
         let forecastTable = `<table><tr><th>Day</th><th>High</th><th>Low</th><th>🌧️</th></tr>`;
         data.daily.time.forEach((date, index) => {
@@ -74,15 +73,15 @@ async function fetchWeather(locationName, lat, lon) {
 
             forecastTable += `<tr>
                 <td>${forecastIcon} ${dayName}</td>
-                <td>${data.daily.temperature_2m_max[index]}°${useFahrenheit ? 'F' : 'C'}</td>
-                <td>${data.daily.temperature_2m_min[index]}°${useFahrenheit ? 'F' : 'C'}</td>
+                <td>${data.daily.temperature_2m_max[index]}°${useMetric ? 'C' : 'F'}</td>
+                <td>${data.daily.temperature_2m_min[index]}°${useMetric ? 'C' : 'F'}</td>
                 <td>${data.daily.precipitation_probability_mean[index]}%</td>`;
             forecastTable += `</tr>`;
         });
         forecastTable += `</table>`;
 
         document.getElementById(locationName).innerHTML = `
-            <strong>${weatherIcon} ${currentTemp}°${useFahrenheit ? 'F' : 'C'} in ${locationName}</strong>
+            <strong>${weatherIcon} ${currentTemp}°${useMetric ? 'C' : 'F'} in ${locationName}</strong>
             <hr>
             <div><small>🌅 ${sunriseTime} 🌇 ${sunsetTime} ${windDirectionIcon} ${windSpeed} ${windUnits}</small></div>
             <hr>
@@ -102,17 +101,21 @@ function refreshList() {
 
 // Toggle temperature unit button click
 document.getElementById("toggle-unit").addEventListener("click", () => {
-    useFahrenheit = !useFahrenheit;
-    document.getElementById("toggle-unit").innerText = useFahrenheit ? "C°" : "F°";
+    const useMetric = localStorage.getItem("useMetric") === "true";
+    localStorage.setItem("useMetric", !useMetric);
+    document.getElementById("toggle-unit").innerText = useMetric ? "C°" : "F°";
     refreshList();
 });
 
 // Toggle extended forecast button click
 document.getElementById("toggle-forecast").addEventListener("click", () => {
-    showExtendedForecast = !showExtendedForecast;
-    document.getElementById("toggle-forecast").innerText = showExtendedForecast ? "3 Day Forecast" : "7 Day Forecast";
+    const showExtendedForecast = localStorage.getItem("showExtendedForecast") === "true";
+    localStorage.setItem("showExtendedForecast", !showExtendedForecast);
+    document.getElementById("toggle-forecast").innerText = showExtendedForecast ? "7 Day Forecast" : "3 Day Forecast";
     refreshList();
 });
 
 // Initial page load
-    refreshList();
+document.getElementById("toggle-unit").innerText = localStorage.getItem("useMetric") === "true" ? "F°" : "C°";
+document.getElementById("toggle-forecast").innerText = localStorage.getItem("showExtendedForecast") === "true" ? "3 Day Forecast" : "7 Day Forecast";
+refreshList();
