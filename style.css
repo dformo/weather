@@ -79,6 +79,38 @@ table {
     margin-top: 10px;
 }
 
+.clickable-row {
+    cursor: pointer;
+}
+
+.hourly-forecast {
+    display: flex;
+    overflow-x: hidden;
+    gap: 10px;
+    white-space: nowrap;
+    max-width: 250px;
+    overflow-x: auto;
+}
+
+.hour-block {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    min-width: auto;
+    padding: 10px;
+    padding-bottom: 15px;
+}
+
+.hour-block small {
+    padding: 2px;
+}
+
+.clickable-row:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
 th, td {
     padding: 8px;
     text-align: left;
