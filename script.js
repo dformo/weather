@@ -97,6 +97,19 @@ function refreshList() {
     Object.keys(locations).forEach(async location => {
         await fetchWeather(location, locations[location].lat, locations[location].lon);
     });
+
+    const now = new Date();   
+    const formattedDate = now.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+    });
+    const formattedTime = now.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true
+    });
+    document.getElementById("timestamp").innerText = `As of ${formattedDate} at ${formattedTime}`;
 }
 
 // Loop through locations and set html to show the data is loading
@@ -127,6 +140,11 @@ document.getElementById("toggle-forecast").addEventListener("click", () => {
     document.getElementById("toggle-forecast").innerText = showExtendedForecast ? "7 Day Forecast" : "3 Day Forecast";
     refreshList();
 });
+
+// Refresh weather every 15 minutes (900000)
+setInterval(() => {
+    refreshList();
+}, 900000);
 
 // Initial page load
 document.getElementById("toggle-unit").innerText = localStorage.getItem("useMetric") === "true" ? "F°" : "C°";
