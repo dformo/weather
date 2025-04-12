@@ -26,6 +26,21 @@ h1 {
     background-color: #003f7f;
 }
 
+#refresh-button {
+    background-color: #00509e;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 10px;
+}
+
+#refresh-button:hover {
+    background-color: #003f7f;
+}
+
 #toggle-forecast {
     background-color: #00509e;
     color: white;
@@ -62,6 +77,7 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 80, 158, 0.2);
     display: inline-block;
+    width: 275px;
 }
 
 .weather strong {
@@ -85,11 +101,10 @@ table {
 
 .hourly-forecast {
     display: flex;
-    overflow-x: hidden;
+    overflow-x: auto;
     gap: 10px;
     white-space: nowrap;
-    max-width: 250px;
-    overflow-x: auto;
+    width: 259px;
 }
 
 .hour-block {
@@ -99,8 +114,8 @@ table {
     background-color: #f8f8f8;
     border-radius: 5px;
     min-width: auto;
-    padding: 10px;
-    padding-bottom: 15px;
+    padding: 5px;
+    margin-bottom: 5px;
 }
 
 .hour-block small {

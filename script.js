@@ -17,7 +17,7 @@ const weatherIcons = {
     1: "🌤️", 2: "🌤️", 3: "⛅", // Partly cloudy
     45: "🌫️", 48: "🌫️", // Fog
     51: "🌧️", 53: "🌧️", 55: "🌧️", 61: "🌧️", 63: "🌧️", 65: "🌧️", 67: "🌧️", // Rain/Drizzle
-    71: "❄️", 73: "❄️", 75: "❄️", 77: "❄️", // Snow
+    71: "❄️", 73: "❄️", 75: "❄️", 77: "❄️", 85: "❄️", // Snow
     80: "🌦️", 81: "🌦️", 82: "🌦️", // Rain showers
     95: "⛈️", 96: "⛈️", 99: "⛈️" // Thunderstorm
 };
@@ -49,7 +49,7 @@ async function fetchWeather(locationName, lat, lon) {
 
     const baseUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
     const dailyForecast = `&daily=temperature_2m_max,temperature_2m_min,weathercode,sunrise,sunset,precipitation_probability_mean`;
-    const hourlyForecast = `&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m`
+    const hourlyForecast = `&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m,precipitation_probability`
     const apiOptions = `&temperature_unit=${tempUnit}&windspeed_unit=${windSpeedUnit}&timezone=auto&forecast_days=${daysToShow}`;
     const url = baseUrl + dailyForecast + hourlyForecast + apiOptions;
 
@@ -58,26 +58,29 @@ async function fetchWeather(locationName, lat, lon) {
         const data = await response.json();
         // console.log(data); /* Debug code */
 
-        const weatherIcon = weatherIcons[data.current_weather.weathercode] || "❓";
+        const unknownIcon = "❓";
+        const weatherIcon = weatherIcons[data.current_weather.weathercode] || unknownIcon;
         const currentTemp = data.current_weather.temperature;
         const sunriseTime = new Date(data.daily.sunrise[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
         const sunsetTime = new Date(data.daily.sunset[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
         const windDirection = getWindDirection(data.current_weather.winddirection);
-        const windDirectionIcon = windIcons[windDirection] || "❓";
+        const windDirectionIcon = windIcons[windDirection] || unknownIcon;
         const windSpeed = data.current_weather.windspeed;
         const windUnits = useMetric ? data.current_weather_units["windspeed"] : windSpeedUnit;
+        const precipIcon = "💧";
 
-        let forecastTable = `<table><thead><tr><th>Day</th><th>High</th><th>Low</th><th>🌧️</th></tr></thead><tbody id="forecast-table">`;
+        let forecastTable = `<table><thead><tr><th>Day</th><th>High</th><th>Low</th><th>${precipIcon}</th></tr></thead><tbody id="forecast-table">`;
         data.daily.time.forEach((date, index) => {
             const dayName = new Date(date + "T00:00:00").toLocaleDateString('en-US', { weekday: 'short' });
-            const forecastIcon = weatherIcons[data.daily.weathercode[index]] || "❓";
+            const forecastIcon = weatherIcons[data.daily.weathercode[index]] || unknownIcon;
             const filteredHourlyData = data.hourly.time
                 .map((time, index) => ({
                     time,
                     weathercode: data.hourly.weathercode[index],
                     temperature: data.hourly.temperature_2m[index],
                     windSpeed: data.hourly.windspeed_10m[index],
-                    windDirection: data.hourly.winddirection_10m[index]
+                    windDirection: data.hourly.winddirection_10m[index],
+                    precipitationProbability: data.hourly.precipitation_probability[index]
                 }))
                 .filter(hourly => hourly.time.split("T")[0] === date)
                 .sort((a, b) => new Date(a.time) - new Date(b.time));
@@ -94,8 +97,9 @@ async function fetchWeather(locationName, lat, lon) {
                         ${filteredHourlyData.map((hour, i) => `
                             <div class="hour-block">
                                 <small>${new Date(hour.time).getHours() % 12 || 12} ${new Date(hour.time).getHours() >= 12 ? "PM" : "AM"}</small>
-                                <small>${weatherIcons[hour.weathercode]} ${hour.temperature}°${useMetric ? "C" : "F"}</small>
-                                <small>${windIcons[getWindDirection(hour.windDirection)]} ${hour.windSpeed} ${useMetric ? "km/h" : "mph"}</small>
+                                <small>${weatherIcons[hour.weathercode]} ${hour.temperature}°</small>
+                                <small>${windIcons[getWindDirection(hour.windDirection)]} ${hour.windSpeed}</small>
+                                <small>${precipIcon} ${hour.precipitationProbability}${data.hourly_units["precipitation_probability"]}</small>
                             </div>
                         `).join("")}
                     </div>
@@ -107,7 +111,7 @@ async function fetchWeather(locationName, lat, lon) {
         document.getElementById(locationName).innerHTML = `
             <strong>${weatherIcon} ${currentTemp}°${useMetric ? 'C' : 'F'} in ${locationName}</strong>
             <hr>
-            <div><small>🌅 ${sunriseTime} 🌇 ${sunsetTime} ${windDirectionIcon} ${windSpeed} ${windUnits}</small></div>
+            <div><small>🌅 ${sunriseTime}  🌇 ${sunsetTime}  ${windDirectionIcon} ${windSpeed} ${windUnits}</small></div>
             <hr>
             ${forecastTable}
         `;
@@ -183,6 +187,11 @@ document.getElementById("toggle-forecast").addEventListener("click", () => {
     const showExtendedForecast = localStorage.getItem("showExtendedForecast") === "true";
     localStorage.setItem("showExtendedForecast", !showExtendedForecast);
     document.getElementById("toggle-forecast").innerText = showExtendedForecast ? "7 Day Forecast" : "3 Day Forecast";
+    refreshList();
+});
+
+// Button click for Refresh
+document.getElementById("refresh-button").addEventListener("click", () => {
     refreshList();
 });
 
