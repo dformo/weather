@@ -190,10 +190,10 @@ document.getElementById("toggle-forecast").addEventListener("click", () => {
     refreshList();
 });
 
-// Button click for Refresh
-document.getElementById("refresh-button").addEventListener("click", () => {
-    refreshList();
-});
+// Button click for Locations: ToDo
+// document.getElementById("locations-button").addEventListener("click", () => {
+//     document.getElementById("popupPanel").style.display = "block";
+// });
 
 // Refresh weather every 15 minutes (900000)
 setInterval(() => {
