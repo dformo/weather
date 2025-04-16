@@ -156,3 +156,230 @@ footer a {
 footer a:hover {
     text-decoration: underline;
 }
+
+/* Locations Popup styling */
+.divider {
+    width: 100%;
+    border: none;
+    height: 2px;
+    background-color: #ccc; /* Light gray for subtle separation */
+    margin: 15px 0; /* Adds spacing around the divider */
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    width: 300px;
+}
+
+.popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.popup-buttons button {
+    margin: 5px;
+}
+
+.popup-header {
+    display: flex;
+    align-items: center; /* Aligns title with close button */
+    justify-content: space-between; /* Keeps them in one row */
+    padding-bottom: 10px;
+}
+
+.popup-header h2 {
+    font-size: 16px;
+    margin: 0;
+    text-align: left;
+}
+
+.popup-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+.popup-actions button {
+    width: 100px;
+    height: 40px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+}
+
+#cancelPopup {
+    background: #6c757d; /* Gray for cancel */
+}
+
+#cancelPopup:hover {
+    background: #5a6268;
+}
+
+#saveChanges {
+    background: #007bff; /* Blue for save */
+}
+
+#saveChanges:hover {
+    background: #0056b3;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 5px;
+    margin: 5px;
+    background: #f0f0f0;
+    cursor: grab;
+}
+
+.scroll-container {
+    max-height: 200px; /* Limits height */
+    overflow-y: auto; /* Enables vertical scrolling */
+    width: 100%; /* Ensures it stretches properly */
+    text-align: left; /* Keeps list left-aligned */
+    padding: 10px;
+    border: 1px solid #ccc; /* Optional styling */
+    flex-grow: 1; /* Makes the list take most of the space */
+}
+
+#locationList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#locationList li {
+    background-color: #d0e7ff; /* Very light blue */
+    color: #003366; /* Dark blue */
+    padding: 8px;
+    border-radius: 5px;
+    margin: 5px 0;
+    cursor: pointer;
+}
+
+#locationList li.selected {
+    background-color: #007bff; /* Highlight selected item in a stronger blue */
+    color: white;
+    font-weight: bold;
+}
+
+.locations-container {
+    display: flex;
+    align-items: flex-start; /* Keeps both elements aligned at the top */
+    justify-content: space-between; /* Pushes buttons to the right */
+    width: 100%;
+}
+
+.new-location-container {
+    display: flex;
+    align-items: flex-start; /* Keeps both elements aligned at the top */
+    justify-content: space-between; /* Pushes buttons to the right */
+    width: 100%;
+}
+
+.add-new-location {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Adds spacing between inputs */
+    align-items: flex-start;
+    width: 100%;
+}
+
+.add-new-location input {
+    width: 90%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#coordinateConverter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    border-radius: 5px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+#coordinateConverter:hover {
+    background: #0056b3;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column; /* Stacks buttons vertically */
+    margin-left: 10px; /* Adds space between list and buttons */
+}
+
+.action-buttons button {
+    width: 40px;
+    height: 40px;
+    font-size: 20px; /* Keeps emoji size consistent */
+    border: none;
+    background: #007bff; /* Matches button styling */
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 5px 0; /* Spaces buttons apart */
+}
+
+.add-button button {
+    display: flex;
+    flex-direction: column; /* Stacks buttons vertically */
+    width: 40px;
+    height: 40px;
+    font-size: 20px; /* Keeps emoji size consistent */
+    border: none;
+    background: #007bff; /* Matches button styling */
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.action-buttons button:hover {
+    background: #0056b3; /* Darker shade on hover */
+}
+
+.add-button button:hover {
+    background: #0056b3; /* Darker shade on hover */
+}
+
+
+/* Hide up/down arrows on numerics */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}

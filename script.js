@@ -1,4 +1,4 @@
-const locations = {
+const defaultLocations = {
     "Mason City": { lat: 43.150626, lon: -93.232637 },
     Manly: { lat: 43.30777783333333, lon: -93.9808 },
     Howell: { lat: 42.633055, lon: -83.933971 },
@@ -122,8 +122,9 @@ async function fetchWeather(locationName, lat, lon) {
 
 // Loop through locations and call api to get weather data
 function refreshList() {
-    Object.keys(locations).forEach(async location => {
-        await fetchWeather(location, locations[location].lat, locations[location].lon);
+    const locations = JSON.parse(localStorage.getItem("locations")) || defaultLocations;
+    Object.keys(locations).forEach(location => {
+        fetchWeather(location, locations[location].lat, locations[location].lon);
     });
 
     const now = new Date();   
@@ -142,6 +143,14 @@ function refreshList() {
 
 // Show / Hide Hourly Forecast
 document.addEventListener("click", (event) => {
+    const popup = document.getElementById("popupPanel");
+    const locationsButton = document.getElementById("locations-button");
+
+    // Check if the click is outside the popup
+    if (!locationsButton.contains(event.target) && !popup.contains(event.target) && popup.style.display === "block") {
+        popup.style.display = "none";
+    }
+
     const row = event.target.closest(".clickable-row");
     if (!row) return;
 
@@ -161,10 +170,21 @@ document.addEventListener("click", (event) => {
     }
 });
 
+// Close Popup When Focus Moves Away
+document.addEventListener("focusin", (event) => {
+    const popup = document.getElementById("popupPanel");
+    
+    if (!popup.contains(event.target) && popup.style.display === "block") {
+        popup.style.display = "none";
+    }
+});
+
 // Loop through locations and set html to show the data is loading
 function setListForLoading() {
     const weatherContainer = document.getElementById("weather-container");
     weatherContainer.innerHTML = "";
+
+    const locations = JSON.parse(localStorage.getItem("locations")) || defaultLocations;
     Object.keys(locations).forEach(location => {
         const locationDiv = document.createElement("div");
         locationDiv.className = "weather";
@@ -190,10 +210,123 @@ document.getElementById("toggle-forecast").addEventListener("click", () => {
     refreshList();
 });
 
-// Button click for Locations: ToDo
-// document.getElementById("locations-button").addEventListener("click", () => {
-//     document.getElementById("popupPanel").style.display = "block";
-// });
+// Button click for managing Locations
+document.getElementById("locations-button").addEventListener("click", () => {
+    const locationList = document.getElementById("locationList");
+    locationList.innerHTML = "";
+
+    const locations = JSON.parse(localStorage.getItem("locations")) || defaultLocations;
+    Object.keys(locations).forEach(location => {
+        const li = document.createElement("li");
+        li.dataset.lat = locations[location].lat;
+        li.dataset.lon = locations[location].lon;
+        li.addEventListener("click", () => {
+            document.querySelectorAll("li").forEach(item => item.classList.remove("selected"));
+            li.classList.add("selected");
+        });
+        li.textContent = location;
+        locationList.appendChild(li);
+    });
+
+    document.getElementById("popupPanel").style.display = "block";
+});
+
+// Single selection for Locations list on popup
+document.getElementById("locationList").addEventListener("click", (event) => {
+    if (event.target.tagName === "LI") {
+        document.querySelectorAll("#locationList li").forEach(item => item.classList.remove("selected"));
+        event.target.classList.add("selected");
+    }
+});
+
+// Move location up / down in list
+document.getElementById("moveUp").addEventListener("click", () => {
+    const selectedItem = document.querySelector("#locationList .selected");
+
+    if (selectedItem && selectedItem.previousElementSibling) {
+        selectedItem.parentNode.insertBefore(selectedItem, selectedItem.previousElementSibling);
+        selectedItem.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+});
+document.getElementById("moveDown").addEventListener("click", () => {
+    const selectedItem = document.querySelector("#locationList .selected");
+
+    if (selectedItem && selectedItem.nextElementSibling) {
+        selectedItem.parentNode.insertBefore(selectedItem.nextElementSibling, selectedItem);
+        selectedItem.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+});
+
+// Delete location from list
+document.getElementById("deleteLocation").addEventListener("click", () => {
+    const selectedItem = document.querySelector("#locationList .selected");
+    if (selectedItem) {
+        selectedItem.remove();
+    }
+});
+
+// Add New Location
+document.getElementById("addLocation").addEventListener("click", () => {
+    const locationName = document.getElementById("newLocation").value.trim();
+    const latitude = document.getElementById("latitude").value.trim();
+    const longitude = document.getElementById("longitude").value.trim();
+
+    // Check if all fields have values before proceeding
+    if (locationName !== "" && latitude !== "" && longitude !== "") {
+        const li = document.createElement("li");
+        li.textContent = locationName;
+        li.dataset.lat = latitude; // Store latitude
+        li.dataset.lon = longitude; // Store longitude
+
+        // Add the new location to the TOP of the list
+        const locationList = document.getElementById("locationList");
+        locationList.insertBefore(li, locationList.firstChild);
+
+        // Select the newly added item
+        document.querySelectorAll("#locationList li").forEach(item => item.classList.remove("selected"));
+        li.classList.add("selected");
+
+        // Scroll new item into view
+        li.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+        // Clear and refocus input fields
+        document.getElementById("newLocation").value = "";
+        document.getElementById("latitude").value = "";
+        document.getElementById("longitude").value = "";
+        document.getElementById("latitude").focus();
+    }
+});
+
+// Save Locations
+document.getElementById("saveChanges").addEventListener("click", () => {
+    const locationList = document.querySelectorAll("#locationList li");
+
+    // Create an object where each location name is the key
+    const savedLocations = {};
+
+    locationList.forEach(item => {
+        savedLocations[item.textContent] = {
+            lat: item.dataset.lat,
+            lon: item.dataset.lon
+        };
+    });
+
+    localStorage.setItem("locations", JSON.stringify(savedLocations));
+
+    setListForLoading();
+    refreshList();
+    document.getElementById("popupPanel").style.display = "none";
+});
+
+// Close popup button
+document.getElementById("closePopup").addEventListener("click", () => {
+    document.getElementById("popupPanel").style.display = "none";
+});
+
+// Cancel popup button
+document.getElementById("cancelPopup").addEventListener("click", () => {
+    document.getElementById("popupPanel").style.display = "none";
+});
 
 // Refresh weather every 15 minutes (900000)
 setInterval(() => {

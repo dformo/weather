@@ -8,16 +8,58 @@
     <link rel="icon" type="image/x-icon" href="assets/app-icon.png">
 </head>
 <body>
+    <!-- Buttons -->
     <div id="controls">
         <button id="toggle-forecast">7 Day Forecast</button>
         <button id="toggle-unit">C°</button>
-        <!-- ToDo: unhide button when Locations popup is ready for use -->
-        <!-- <button id="locations-button" title="Locations"><img src="assets/gear.png" alt="Locations"></button> -->
-    </div>    
+        <button id="locations-button" title="Locations"><img id="locations-button-img" src="assets/gear.png" alt="Locations"></button>
+    </div>
+
+    <!-- Manage Locations Popup -->
+    <div id="popupPanel" class="popup">
+        <div class="popup-header">
+            <h2>Manage Locations</h2>
+            <span id="closePopup" class="close-button">&times;</span>
+        </div>
+        <div class="popup-content">
+            <div class="locations-container">
+                <div class="scroll-container">
+                    <ul id="locationList"></ul>
+                </div>
+                <div class="action-buttons">
+                    <button id="moveUp">⬆️</button>
+                    <button id="moveDown">⬇️</button>
+                    <button id="deleteLocation">🗑️</button>
+                </div>
+            </div>
+            <br>
+            <div class="new-location-container">
+                <div class="add-new-location">
+                    <input type="number" id="latitude" placeholder="Enter new latitude">
+                    <input type="number" id="longitude" placeholder="Enter new longitude">
+                    <input type="text" id="newLocation" placeholder="Enter new location name">
+                </div>
+                <div class="add-button">
+                    <button id="addLocation">🆕</button>
+                    <a id="coordinateConverter" title="Lookup latitude and longitude" href="https://gps-coordinates.org/coordinate-converter.php" target="_blank">
+                        🔍
+                    </a>                
+                </div>
+            </div>
+            <hr class="divider">
+            <div class="popup-actions">
+                <button id="cancelPopup">Cancel</button>
+                <button id="saveChanges">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Last refresh date/time -->
     <p id="timestamp"></p>
     <div id="weather-container">
         Loading weather data...
     </div>
+
     <script src="script.js"></script>
 </body>
 <footer>
