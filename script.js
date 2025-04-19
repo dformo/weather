@@ -60,7 +60,7 @@ async function fetchWeather(locationName, lat, lon) {
 
         const unknownIcon = "❓";
         const weatherIcon = weatherIcons[data.current_weather.weathercode] || unknownIcon;
-        const currentTemp = data.current_weather.temperature;
+        const currentTemp = Math.round(data.current_weather.temperature);
         const sunriseTime = new Date(data.daily.sunrise[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
         const sunsetTime = new Date(data.daily.sunset[0]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
         const windDirection = getWindDirection(data.current_weather.winddirection);
@@ -77,8 +77,8 @@ async function fetchWeather(locationName, lat, lon) {
                 .map((time, index) => ({
                     time,
                     weathercode: data.hourly.weathercode[index],
-                    temperature: data.hourly.temperature_2m[index],
-                    windSpeed: data.hourly.windspeed_10m[index],
+                    temperature: Math.round(data.hourly.temperature_2m[index]),
+                    windSpeed: Math.round(data.hourly.windspeed_10m[index]),
                     windDirection: data.hourly.winddirection_10m[index],
                     precipitationProbability: data.hourly.precipitation_probability[index]
                 }))
@@ -87,8 +87,8 @@ async function fetchWeather(locationName, lat, lon) {
 
             forecastTable += `<tr class="clickable-row" data-index="${locationName}-${index}">
                 <td>${forecastIcon} ${dayName}</td>
-                <td>${data.daily.temperature_2m_max[index]}°${useMetric ? 'C' : 'F'}</td>
-                <td>${data.daily.temperature_2m_min[index]}°${useMetric ? 'C' : 'F'}</td>
+                <td>${Math.round(data.daily.temperature_2m_max[index])}°${useMetric ? 'C' : 'F'}</td>
+                <td>${Math.round(data.daily.temperature_2m_min[index])}°${useMetric ? 'C' : 'F'}</td>
                 <td>${data.daily.precipitation_probability_mean[index]}%</td></tr>`;
 
             forecastTable += `<tr class="hourly-row" data-index="${locationName}-${index}" style="display: none;">
