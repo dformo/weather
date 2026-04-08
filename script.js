@@ -47,14 +47,21 @@ async function fetchWeather(locationName, lat, lon) {
     const windSpeedUnit = useMetric ? "kmh" : "mph";
     const daysToShow = showExtendedForecast ? 7 : 3;
 
-    const baseUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-    const dailyForecast = `&daily=temperature_2m_max,temperature_2m_min,weathercode,sunrise,sunset,precipitation_probability_mean`;
-    const hourlyForecast = `&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m,precipitation_probability`
-    const apiOptions = `&temperature_unit=${tempUnit}&windspeed_unit=${windSpeedUnit}&timezone=auto&forecast_days=${daysToShow}`;
-    const url = baseUrl + dailyForecast + hourlyForecast + apiOptions;
+    const params = new URLSearchParams({
+        latitude: lat,
+        longitude: lon,
+        current_weather: 'true',
+        daily: 'temperature_2m_max,temperature_2m_min,weathercode,sunrise,sunset,precipitation_probability_mean',
+        hourly: 'temperature_2m,weathercode,windspeed_10m,winddirection_10m,precipitation_probability',
+        temperature_unit: tempUnit,
+        windspeed_unit: windSpeedUnit,
+        timezone: 'auto',
+        forecast_days: daysToShow.toString()
+    });
+    const proxyUrl = `https://dformo-weather.netlify.app/.netlify/functions/proxy?${params}`;
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(proxyUrl);
         const data = await response.json();
         // console.log(data); /* Debug code */
 
