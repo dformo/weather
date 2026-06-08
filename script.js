@@ -2,13 +2,11 @@ const defaultLocations = {
     "Mason City": { lat: 43.150626, lon: -93.232637 },
     Manly: { lat: 43.30777783333333, lon: -93.9808 },
     Howell: { lat: 42.633055, lon: -83.933971 },
-    Omaha: { lat: 41.281406, lon: -96.213680 },
     Springfield: { lat: 37.2153, lon: -93.2982 },
-    Groton: { lat: 41.3747, lon: -72.0691 },
     Mitaka: { lat: 35.6838, lon: 139.5594 },
-    Shizuoka: { lat: 35.0571817, lon: 138.0814498 },
     Kobe: { lat: 34.6913, lon: 135.183 },
-    "Lino Lakes": { lat: 45.1395615, lon: -93.0291282 }
+    "Lino Lakes": { lat: 45.1395615, lon: -93.0291282 },
+    Omaha: { lat: 41.281406, lon: -96.213680 }
 };
 
 // Map Open-Meteo weather codes to icons
