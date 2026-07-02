@@ -3,10 +3,11 @@ const defaultLocations = {
     Manly: { lat: 43.30777783333333, lon: -93.9808 },
     Howell: { lat: 42.633055, lon: -83.933971 },
     Springfield: { lat: 37.2153, lon: -93.2982 },
+    Caledonia : { lat: 42.786584, lon: -85.511803 },
     Mitaka: { lat: 35.6838, lon: 139.5594 },
     Kobe: { lat: 34.6913, lon: 135.183 },
-    "Lino Lakes": { lat: 45.1395615, lon: -93.0291282 },
-    Omaha: { lat: 41.281406, lon: -96.213680 }
+    Shizuoka: { lat: 41.281406, lon: -96.213680 },
+    "Lino Lakes": { lat: 45.1395615, lon: -93.0291282 }
 };
 
 // Map Open-Meteo weather codes to icons
