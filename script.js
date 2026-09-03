@@ -271,6 +271,25 @@ document.getElementById("deleteLocation").addEventListener("click", () => {
     }
 });
 
+// Default locations into list
+document.getElementById("defaultLocations").addEventListener("click", () => {
+    const locationList = document.getElementById("locationList");
+    locationList.innerHTML = "";
+
+    const locations = defaultLocations;
+    Object.keys(locations).forEach(location => {
+        const li = document.createElement("li");
+        li.dataset.lat = locations[location].lat;
+        li.dataset.lon = locations[location].lon;
+        li.addEventListener("click", () => {
+            document.querySelectorAll("li").forEach(item => item.classList.remove("selected"));
+            li.classList.add("selected");
+        });
+        li.textContent = location;
+        locationList.appendChild(li);
+    });
+});
+
 // Add New Location
 document.getElementById("addLocation").addEventListener("click", () => {
     const locationName = document.getElementById("newLocation").value.trim();
